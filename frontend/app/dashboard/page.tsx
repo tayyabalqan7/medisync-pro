@@ -92,18 +92,18 @@ export default function DashboardPage() {
               <h2 className="font-semibold mb-4">Quick Actions</h2>
               <div className="space-y-3">
                 {[
-                  { href: '/scanner', icon: ScanLine, label: 'Scan Prescription', color: 'sky' },
-                  { href: '/symptoms', icon: Stethoscope, label: 'Check Symptoms', color: 'teal' },
-                  { href: '/records', icon: Plus, label: 'Add Record', color: 'green' },
-                  { href: '/interactions', icon: AlertTriangle, label: 'Check Drug Interactions', color: 'orange' },
+                  { href: '/scanner', icon: ScanLine, label: 'Scan Prescription', iconClass: 'bg-sky-500/20', textClass: 'text-sky-400' },
+                  { href: '/symptoms', icon: Stethoscope, label: 'Check Symptoms', iconClass: 'bg-teal-500/20', textClass: 'text-teal-400' },
+                  { href: '/records', icon: Plus, label: 'Add Record', iconClass: 'bg-green-500/20', textClass: 'text-green-400' },
+                  { href: '/interactions', icon: AlertTriangle, label: 'Check Drug Interactions', iconClass: 'bg-orange-500/20', textClass: 'text-orange-400' },
                 ].map((action, i) => (
                   <Link key={i} href={action.href}>
                     <motion.div
                       whileHover={{ x: 4 }}
                       className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition cursor-pointer"
                     >
-                      <div className={`p-2 bg-${action.color}-500/20 rounded-lg`}>
-                        <action.icon className={`w-4 h-4 text-${action.color}-400`} />
+                      <div className={`p-2 ${action.iconClass} rounded-lg`}>
+                        <action.icon className={`w-4 h-4 ${action.textClass}`} />
                       </div>
                       <span className="text-sm font-medium">{action.label}</span>
                     </motion.div>
