@@ -12,7 +12,6 @@ interface ExtractedMed {
 
 export default function ScannerPage() {
   const [isDragging, setIsDragging] = useState(false);
-  const [, setFile] = useState<File | null>(null);
   const [processing, setProcessing] = useState(false);
   const [extractedText, setExtractedText] = useState('');
   const [extractedMeds, setExtractedMeds] = useState<ExtractedMed[]>([]);
@@ -20,7 +19,6 @@ export default function ScannerPage() {
   const [step, setStep] = useState<'idle' | 'uploading' | 'ocr' | 'matching' | 'done'>('idle');
 
   const processFile = async (f: File) => {
-    setFile(f as File);
     setStep('uploading');
     setProcessing(true);
     setProgress(10);
@@ -105,7 +103,6 @@ export default function ScannerPage() {
   }, []);
 
   const reset = () => {
-    setFile(null);
     setExtractedText('');
     setExtractedMeds([]);
     setStep('idle');

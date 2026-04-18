@@ -9,6 +9,9 @@ const router = express.Router();
 const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET || 'fallback-secret', { expiresIn: '7d' });
 
+// Extra safeguard against injection: ensure email is a plain lowercase string
+const sanitizeEmail = (email) => String(email).toLowerCase().trim();
+
 router.post('/register', [
   body('name').notEmpty().trim(),
   body('email').isEmail().normalizeEmail(),
@@ -19,8 +22,7 @@ router.post('/register', [
 
   try {
     const { name, email, password, role } = req.body;
-    // Ensure email is a plain string (extra safeguard against injection)
-    const sanitizedEmail = String(email).toLowerCase().trim();
+    const sanitizedEmail = sanitizeEmail(email);
     const existing = await User.findOne({ email: sanitizedEmail });
     if (existing) return res.status(400).json({ message: 'Email already registered' });
 
@@ -41,8 +43,7 @@ router.post('/login', [
 
   try {
     const { email, password } = req.body;
-    // Ensure email is a plain string (extra safeguard against injection)
-    const sanitizedEmail = String(email).toLowerCase().trim();
+    const sanitizedEmail = sanitizeEmail(email);
     const user = await User.findOne({ email: sanitizedEmail });
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: 'Invalid credentials' });
