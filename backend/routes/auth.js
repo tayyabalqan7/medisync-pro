@@ -19,10 +19,12 @@ router.post('/register', [
 
   try {
     const { name, email, password, role } = req.body;
-    const existing = await User.findOne({ email });
+    // Ensure email is a plain string (extra safeguard against injection)
+    const sanitizedEmail = String(email).toLowerCase().trim();
+    const existing = await User.findOne({ email: sanitizedEmail });
     if (existing) return res.status(400).json({ message: 'Email already registered' });
 
-    const user = await User.create({ name, email, password, role });
+    const user = await User.create({ name: String(name).trim(), email: sanitizedEmail, password, role });
     const token = generateToken(user._id);
     res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
   } catch (err) {
@@ -39,7 +41,9 @@ router.post('/login', [
 
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    // Ensure email is a plain string (extra safeguard against injection)
+    const sanitizedEmail = String(email).toLowerCase().trim();
+    const user = await User.findOne({ email: sanitizedEmail });
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -59,7 +63,10 @@ router.put('/profile', authenticate, async (req, res) => {
     const updates = req.body;
     delete updates.password;
     delete updates.role;
-    const user = await User.findByIdAndUpdate(req.user._id, updates, { new: true }).select('-password');
+    // Use $set with whitelisted fields only to prevent injection
+    const { name, phone, dateOfBirth, gender, bloodGroup, allergies, chronicConditions } = updates;
+    const safeUpdates = { name, phone, dateOfBirth, gender, bloodGroup, allergies, chronicConditions };
+    const user = await User.findByIdAndUpdate(req.user._id, { $set: safeUpdates }, { new: true, runValidators: true }).select('-password');
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });
